@@ -164,7 +164,7 @@ ipcMain.handle('open-external-link', async (event, url) => {
 function createWindow() {
   log.info('Criando janela principal')
   win = new BrowserWindow({
-    width: 1200,
+    width: 1400,
     height: 785,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -553,20 +553,28 @@ ipcMain.handle('fetch-programming-data-filtered', async (event, filters) => {
   `
   const params = []
 
+  // Filtro por Data Emissão Inicial
   if (filters.dataEmissaoInicial) {
     params.push(filters.dataEmissaoInicial)
     query += ` AND p.data_emissao >= $${params.length}`
   }
+  // Filtro por Data Emissão Final
   if (filters.dataEmissaoFinal) {
     params.push(filters.dataEmissaoFinal)
     query += ` AND p.data_emissao <= $${params.length}`
   }
 
+  // Filtro de status
   if (filters.somenteNaoImpresso === true) {
     query += ` AND (p.status_impresso = false OR p.status_impresso IS NULL)`
   } else if (filters.somenteNaoImpresso === false) {
     query += ` AND p.status_impresso = true`
   }
+
+  // Ordenar por data de emissão crescente
+  query += ` ORDER BY p.data_emissao ASC`
+
+  // console.log('Query final:', query, params)
   try {
     const result = await dbPool.query(query, params)
     return result.rows

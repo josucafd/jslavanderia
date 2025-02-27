@@ -1,6 +1,6 @@
 {
   "name": "jslavanderia",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "main": "electron/main.js",
   "description": "Aplicativo JSLavanderia.",
   "author": "Josué Figueredo Delfino <josue.delfino@jslavanderia.com.br>",
@@ -14,7 +14,11 @@
   "build": {
     "appId": "com.jslavanderia.app",
     "productName": "JSLavanderia",
-    "files": ["dist/**/*", "electron/**/*", "package.json"],
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
     "directories": {
       "buildResources": "build"
     },
@@ -72,7 +76,7 @@
     "electron": "^32.0.2",
     "electron-builder": "^24.13.3",
     "postcss": "^8.4.45",
-    "tailwindcss": "^3.4.10",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.5.3",
     "vite": "^6.2.0",
     "wait-on": "^8.0.0"

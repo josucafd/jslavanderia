@@ -553,21 +553,20 @@ ipcMain.handle('fetch-programming-data-filtered', async (event, filters) => {
   `
   const params = []
 
-  // Filtro de data (opcional)
-  if (filters.dataEmissao) {
-    params.push(filters.dataEmissao)
-    query += ` AND p.data_emissao = $${params.length}`
+  if (filters.dataEmissaoInicial) {
+    params.push(filters.dataEmissaoInicial)
+    query += ` AND p.data_emissao >= $${params.length}`
+  }
+  if (filters.dataEmissaoFinal) {
+    params.push(filters.dataEmissaoFinal)
+    query += ` AND p.data_emissao <= $${params.length}`
   }
 
-  // Filtro de impressos vs não impressos
   if (filters.somenteNaoImpresso === true) {
-    // Somente não impressos (false ou null)
     query += ` AND (p.status_impresso = false OR p.status_impresso IS NULL)`
-  } else {
-    // Somente impressos (true)
+  } else if (filters.somenteNaoImpresso === false) {
     query += ` AND p.status_impresso = true`
   }
-
   try {
     const result = await dbPool.query(query, params)
     return result.rows

@@ -1,6 +1,6 @@
 {
   "name": "jslavanderia",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "electron/main.js",
   "description": "Aplicativo JSLavanderia.",
   "author": "Josué Figueredo Delfino <josue.delfino@jslavanderia.com.br>",
@@ -28,7 +28,8 @@
       {
         "provider": "github",
         "owner": "josucafd",
-        "repo": "jslavanderia"
+        "repo": "jslavanderia",
+        "private": true
       }
     ],
     "win": {

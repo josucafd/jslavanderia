@@ -9,15 +9,11 @@ export function usePhotoLoader(selectedRow, readFolderPath) {
   const lastReferenciaRef = useRef(null)
 
   useEffect(() => {
+    // console.log('usePhotoLoader:', { selectedRow, readFolderPath })
     async function loadPhoto(row) {
       if (!row?.Referencia || !readFolderPath) return
-
-      // Evita buscas repetidas para a mesma referência
-      if (row.Referencia === lastReferenciaRef.current) {
-        return
-      }
+      if (row.Referencia === lastReferenciaRef.current) return
       lastReferenciaRef.current = row.Referencia
-
       try {
         const photoPath = await fetchPhoto(readFolderPath, row.Referencia)
         if (photoPath) {
@@ -35,7 +31,6 @@ export function usePhotoLoader(selectedRow, readFolderPath) {
         setPhotoUrl(null)
       }
     }
-
     if (selectedRow?.Referencia && readFolderPath) {
       loadPhoto(selectedRow)
     }

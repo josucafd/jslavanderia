@@ -1,17 +1,20 @@
+// src/components/ProgrammingTable.jsx
 import React, { useState, useEffect } from 'react'
 
 const ProgrammingTable = ({ setSelectedRow, reloadKey, onDataLoaded }) => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [dataEmissao, setDataEmissao] = useState('')
+  const [dataEmissaoInicial, setDataEmissaoInicial] = useState('')
+  const [dataEmissaoFinal, setDataEmissaoFinal] = useState('')
   const [somenteNaoImpresso, setSomenteNaoImpresso] = useState(true)
 
   const loadData = async () => {
     setLoading(true)
     try {
       const result = await window.electronAPI.fetchProgrammingDataFiltered({
-        dataEmissao: dataEmissao || null,
+        dataEmissaoInicial: dataEmissaoInicial || null,
+        dataEmissaoFinal: dataEmissaoFinal || null,
         somenteNaoImpresso,
       })
       setData(result)
@@ -23,27 +26,38 @@ const ProgrammingTable = ({ setSelectedRow, reloadKey, onDataLoaded }) => {
     }
   }
 
+  // Recarrega os dados sempre que os filtros ou reloadKey mudam
   useEffect(() => {
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reloadKey, dataEmissao, somenteNaoImpresso])
+  }, [reloadKey, dataEmissaoInicial, dataEmissaoFinal, somenteNaoImpresso])
 
   const resetFilters = () => {
-    setDataEmissao('')
+    setDataEmissaoInicial('')
+    setDataEmissaoFinal('')
     setSomenteNaoImpresso(true)
   }
 
   return (
     <div>
       {/* Controles de Filtro */}
-      <div className="flex justify-between items-center gap-4 mb-6 pr-10">
+      <div className="flex justify-between items-center gap-4 mb-6 pr-6">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <label className="whitespace-nowrap">Data Emissão:</label>
+            <label className="whitespace-nowrap">Data Emissão Inicial:</label>
             <input
               type="date"
-              value={dataEmissao}
-              onChange={e => setDataEmissao(e.target.value)}
+              value={dataEmissaoInicial}
+              onChange={e => setDataEmissaoInicial(e.target.value)}
+              className="border p-1"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="whitespace-nowrap">Data Emissão Final:</label>
+            <input
+              type="date"
+              value={dataEmissaoFinal}
+              onChange={e => setDataEmissaoFinal(e.target.value)}
               className="border p-1"
             />
           </div>
@@ -64,7 +78,7 @@ const ProgrammingTable = ({ setSelectedRow, reloadKey, onDataLoaded }) => {
         </button>
       </div>
 
-      {/* Container que controla a rolagem e padding lateral */}
+      {/* Container da Tabela com padding lateral e rolagem */}
       <div className="pr-6 overflow-y-auto max-h-[calc(100vh-400px)]">
         {loading ? (
           <div>Carregando dados...</div>
@@ -76,7 +90,6 @@ const ProgrammingTable = ({ setSelectedRow, reloadKey, onDataLoaded }) => {
             cellPadding="8"
             className="w-full text-center border-collapse"
           >
-            {/* Thead com posição sticky */}
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
                 <th className="p-2">Data Emissão</th>

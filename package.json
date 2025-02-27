@@ -1,6 +1,6 @@
 {
   "name": "jslavanderia",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "electron/main.js",
   "description": "Aplicativo JSLavanderia.",
   "author": "Josué Figueredo Delfino <josue.delfino@jslavanderia.com.br>",
@@ -51,6 +51,7 @@
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.439.0",
+    "pg": "^8.13.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.2",
@@ -58,6 +59,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/node": "^22.5.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -71,7 +73,7 @@
     "postcss": "^8.4.45",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.3",
-    "vite": "^5.4.3",
+    "vite": "^6.2.0",
     "wait-on": "^8.0.0"
   }
 }

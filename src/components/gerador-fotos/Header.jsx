@@ -5,10 +5,8 @@ import { toast } from '../../hooks/use-toast'
 
 const Header = ({
   updateAvailable,
-  handleSelectFile,
   handleSaveProgram,
   handleSaveProgramMass,
-  excelData,
   setIsSettingsOpen,
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -32,34 +30,17 @@ const Header = ({
       <div className="flex items-center space-x-2">
         {updateAvailable && (
           <Button
-            onClick={simulateUpdate}
+            // Se necessário, adicione a função simulateUpdate ou outra ação para atualizar
+            onClick={() => console.log('Atualizar')}
             className="bg-yellow-800 text-white hover:bg-yellow-700 flex items-center space-x-2"
           >
             <AlertTriangle className="h-4 w-4" />
             <span>Atualizar</span>
           </Button>
         )}
-        <Button onClick={handleSelectFile}>Selecionar Arquivo</Button>
-        <Button
-          onClick={handleSaveProgram}
-          disabled={!excelData || excelData.length === 0}
-          className={
-            !excelData || excelData.length === 0
-              ? 'bg-gray-300 text-gray-500'
-              : ''
-          }
-        >
-          Salvar Programação
-        </Button>
-        <Button
-          onClick={handleSaveProgramMass}
-          disabled={!excelData || excelData.length === 0}
-          className={
-            !excelData || excelData.length === 0
-              ? 'bg-gray-300 text-gray-500'
-              : ''
-          }
-        >
+        {/* Botões sempre habilitados */}
+        <Button onClick={handleSaveProgram}>Salvar Programação</Button>
+        <Button onClick={handleSaveProgramMass}>
           Salvar Programação Em Massa
         </Button>
         <Button

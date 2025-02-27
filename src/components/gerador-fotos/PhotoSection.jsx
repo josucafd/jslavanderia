@@ -8,7 +8,7 @@ const PhotoSection = ({
 }) => {
   return (
     <div
-      className="w-[300px] bg-white flex-shrink-0 border border-border rounded-lg p-4"
+      className="w-[300px] bg-white flex-shrink-0 border border-border rounded-lg p-4 max-h-[610px] overflow-auto"
       id="photo-section"
       ref={photoSectionRef}
     >

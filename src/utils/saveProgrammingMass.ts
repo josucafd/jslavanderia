@@ -20,33 +20,33 @@ declare global {
 }
 
 export async function saveProgrammingMass(
-  fileName: string, // Nome do arquivo a ser salvo
-  writeFolderPath: string, // O caminho da pasta de escrita
-  photoSectionRef: React.RefObject<HTMLDivElement> // Referência ao elemento photo-section
+  fileName,
+  writeFolderPath,
+  photoSectionRef
 ) {
   if (!photoSectionRef.current) {
     console.error('Elemento photo-section não encontrado')
-    return
+    // Retorne um objeto com success = false para evitar undefined
+    return { success: false, message: 'Elemento photo-section não encontrado.' }
   }
 
   try {
-    // Captura a imagem da programação
+    // Captura a imagem
     const canvas = await html2canvas(photoSectionRef.current, { useCORS: true })
     const imageData = canvas.toDataURL('image/jpeg', 1.0)
 
-    // Enviar para o backend salvar
+    // Chama o IPC
     const result = await window.electronAPI.saveProgrammingMass({
       fileName,
       imageData,
       writeFolderPath,
     })
 
-    if (result.success) {
-      console.log(`Imagem ${fileName} salva com sucesso!`)
-    } else {
-      console.error(`Erro ao salvar a imagem ${fileName}:`, result.message)
-    }
+    // Sempre retorne result
+    return result
   } catch (error) {
     console.error('Erro ao capturar a imagem:', error)
+    // Retorne um objeto com success = false
+    return { success: false, message: error.message }
   }
 }

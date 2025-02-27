@@ -28,6 +28,48 @@ const configFilePath = path.join(app.getPath('userData'), 'config.json')
 // Definir o caminho para o package.json
 const packageJsonPath = path.join(__dirname, '..', 'package.json')
 
+// -----------------------------
+// Conexão com o banco de dados PostgreSQL
+// -----------------------------
+const { Pool } = require('pg')
+
+// Configure o pool com os dados do seu banco hospedado em 192.168.75.249
+const dbPool = new Pool({
+  host: '192.168.75.249',
+  database: 'nocobase',
+  user: 'postgres',
+  password: 'j8kdaC6dYYwsjs5',
+  port: 5432,
+})
+
+// Função que executa a consulta com os JOINs necessários
+async function fetchProgrammingData() {
+  const query = `
+    SELECT
+      p.op_interna AS "Op Interna",
+      p.op_cliente AS "Op Cliente",
+      r.referencia AS "Referencia",
+      cf.fantasia AS "Cliente",
+      p.qtd_op AS "Quantidade"
+    FROM public.tb_programacoes p
+    LEFT JOIN public.tb_referencias r ON p.id_referencia = r.id_referencia
+    LEFT JOIN public.tb_clientes_fornecedores cf ON p.id_cliente_fornecedor = cf.id_cliente_fornecedor;
+  `
+  // console.log('Executando query:', query) // Adicione este log
+  try {
+    const result = await dbPool.query(query)
+    return result.rows
+  } catch (error) {
+    console.error('Erro ao consultar dados do banco:', error)
+    throw error
+  }
+}
+
+// Expor a função via IPC para que o renderer possa chamá-la
+ipcMain.handle('fetch-programming-data', async () => {
+  return await fetchProgrammingData()
+})
+
 // Ler o package.json e salvar a versão no config.json
 async function loadAndSaveVersion() {
   try {
@@ -457,18 +499,18 @@ ipcMain.handle(
         throw new Error('Caminho da pasta de gravação não definido.')
       }
 
-      // Verifique se a pasta de gravação existe
+      // Cria a pasta, se não existir
       const savePath = path.resolve(writeFolderPath)
-      await fs.mkdir(savePath, { recursive: true }) // Cria a pasta, se não existir
+      await fs.mkdir(savePath, { recursive: true })
 
       const fullPath = path.join(savePath, fileName)
-
-      // Remove o prefixo 'data:image/jpeg;base64,' dos dados da imagem
       const base64Data = imageData.replace(/^data:image\/jpeg;base64,/, '')
 
-      // Salva o arquivo de imagem no sistema, sobrescrevendo se já existir
+      // Salva o arquivo
       await fs.writeFile(fullPath, base64Data, 'base64')
       console.log(`Imagem salva com sucesso: ${fullPath}`)
+
+      // Retorna objeto com success
       return { success: true, path: fullPath }
     } catch (error) {
       console.error('Erro ao salvar a imagem:', error)
@@ -476,3 +518,61 @@ ipcMain.handle(
     }
   }
 )
+
+// Atualiza o status_impresso para true no registro da programação
+ipcMain.handle('update-printed-status', async (event, recordId) => {
+  const query = `
+    UPDATE public.tb_programacoes
+    SET status_impresso = true
+    WHERE id_programacao = $1
+  `
+  try {
+    const result = await dbPool.query(query, [recordId])
+    return { success: true, affectedRows: result.rowCount }
+  } catch (error) {
+    console.error('Erro ao atualizar status impresso:', error)
+    return { success: false, message: error.message }
+  }
+})
+
+// Busca registros com filtros: data de emissão e somente registros não impressos
+ipcMain.handle('fetch-programming-data-filtered', async (event, filters) => {
+  let query = `
+    SELECT p.id_programacao,
+           p.data_emissao AS "Data Emissão",
+           p.op_interna AS "Op Interna",
+           p.op_cliente AS "Op Cliente",
+           r.referencia AS "Referencia",
+           cf.fantasia AS "Cliente",
+           p.qtd_op AS "Quantidade",
+           p.status_impresso AS "Status"
+    FROM public.tb_programacoes p
+    LEFT JOIN public.tb_referencias r ON p.id_referencia = r.id_referencia
+    LEFT JOIN public.tb_clientes_fornecedores cf ON p.id_cliente_fornecedor = cf.id_cliente_fornecedor
+    WHERE 1=1
+  `
+  const params = []
+
+  // Filtro de data (opcional)
+  if (filters.dataEmissao) {
+    params.push(filters.dataEmissao)
+    query += ` AND p.data_emissao = $${params.length}`
+  }
+
+  // Filtro de impressos vs não impressos
+  if (filters.somenteNaoImpresso === true) {
+    // Somente não impressos (false ou null)
+    query += ` AND (p.status_impresso = false OR p.status_impresso IS NULL)`
+  } else {
+    // Somente impressos (true)
+    query += ` AND p.status_impresso = true`
+  }
+
+  try {
+    const result = await dbPool.query(query, params)
+    return result.rows
+  } catch (error) {
+    console.error('Erro ao buscar dados filtrados:', error)
+    throw error
+  }
+})

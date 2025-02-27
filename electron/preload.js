@@ -28,8 +28,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Funções relacionadas à programação (salvar dados)
   // --------------------------
   saveProgram: data => ipcRenderer.invoke('save-program', data),
-  saveProgrammingMass: data =>
-    ipcRenderer.invoke('save-programming-mass', data),
+  saveProgrammingMass: args =>
+    ipcRenderer.invoke('save-programming-mass', args),
+  fetchProgrammingData: () => ipcRenderer.invoke('fetch-programming-data'),
+  fetchProgrammingDataFiltered: filters =>
+    ipcRenderer.invoke('fetch-programming-data-filtered', filters),
+  updatePrintedStatus: recordId =>
+    ipcRenderer.invoke('update-printed-status', recordId),
 
   // --------------------------
   // Funções relacionadas à versão e atualização do app
